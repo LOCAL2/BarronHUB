@@ -2,26 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
 
-// 1. Map Information Configuration (Links & Thumbnails)
-const mapMetadata = {
-    'ArsenalHub.lua': {
-        name: 'Arsenal',
-        link: 'https://www.roblox.com/games/286090429/Arsenal',
-        image: 'https://assetgame.roblox.com/Game/Tools/ThumbnailAsset.ashx?aid=286090429&fmt=png&wd=420&ht=230'
-    },
-    'CleanAllTheLeavesHub.lua': {
-        name: 'Clean All The Leaves',
-        link: 'https://www.roblox.com/games/16474136661/Clean-All-The-Leaves',
-        image: 'https://assetgame.roblox.com/Game/Tools/ThumbnailAsset.ashx?aid=16474136661&fmt=png&wd=420&ht=230'
-    },
-    'HeroesRNG.luau': {
-        name: 'Heroes RNG',
-        link: 'https://www.roblox.com/games/16773539194/Heroes-RNG',
-        image: 'https://assetgame.roblox.com/Game/Tools/ThumbnailAsset.ashx?aid=16773539194&fmt=png&wd=420&ht=230'
-    }
-};
-
-// 2. Get git remote URL to construct raw loadstring URLs
+// 1. Get git remote URL to construct raw loadstring URLs
 function getGitInfo() {
     try {
         const url = execSync('git config --get remote.origin.url', { encoding: 'utf8' }).trim();
@@ -46,7 +27,7 @@ function getGitInfo() {
     return null;
 }
 
-// 3. Fallback map name formatter
+// 2. Format filename to human readable map name
 function getMapName(filename) {
     let base = path.parse(filename).name;
     if (base.endsWith('Hub')) {
@@ -56,7 +37,7 @@ function getMapName(filename) {
     return formatted.trim();
 }
 
-// 4. Obfuscation helper (Byte-array loader wrapper)
+// 3. Obfuscation helper (Byte-array loader wrapper)
 function obfuscateCode(originalCode, scriptName) {
     let cleanCode = originalCode;
     if (cleanCode.charCodeAt(0) === 0xFEFF) {
@@ -107,31 +88,23 @@ files.forEach(file => {
     originalSources[file] = fs.readFileSync(filePath, 'utf8');
 });
 
-// 5. Build minimal, professional README containing ONLY map sections with links & images
+// 4. Build clean README with ONLY map headers and loadstring codeblocks
 let readmeContent = `# BarronHUB\n\n`;
 
 files.forEach(file => {
-    const meta = mapMetadata[file] || {
-        name: getMapName(file),
-        link: `https://www.roblox.com/discover`,
-        image: ''
-    };
+    const mapName = getMapName(file);
     const rawUrl = `${rawBaseUrl}/${file}`;
 
-    readmeContent += `## ${meta.name}\n\n`;
-    if (meta.image) {
-        readmeContent += `[![${meta.name}](${meta.image})](${meta.link})\n\n`;
-    }
-    readmeContent += `[Game Link](${meta.link})\n\n`;
+    readmeContent += `## ${mapName}\n\n`;
     readmeContent += `\`\`\`lua\n`;
     readmeContent += `loadstring(game:HttpGet("${rawUrl}"))()\n`;
     readmeContent += `\`\`\`\n\n`;
 });
 
 fs.writeFileSync(path.join(workspaceDir, 'README.md'), readmeContent, 'utf8');
-console.log('Updated README.md with map sections, links, and images (No extra sections / emojis).');
+console.log('Updated README.md with clean map headers and loadstrings only.');
 
-// 6. Obfuscate files locally for git push
+// 5. Obfuscate files locally for git push
 console.log('Obfuscating scripts for commit...');
 files.forEach(file => {
     const filePath = path.join(workspaceDir, file);
@@ -139,7 +112,7 @@ files.forEach(file => {
     fs.writeFileSync(filePath, obfuscated, 'utf8');
 });
 
-// 7. Execute Git Commands
+// 6. Execute Git Commands
 try {
     if (!fs.existsSync(path.join(workspaceDir, '.git'))) {
         console.log('Initializing git repository...');
@@ -152,7 +125,7 @@ try {
 
     console.log('Committing changes...');
     try {
-        execSync('git commit -m "docs: simplify README to map sections with images and links only"', { cwd: workspaceDir, stdio: 'inherit' });
+        execSync('git commit -m "docs: simplify README to map headings and loadstring code blocks only"', { cwd: workspaceDir, stdio: 'inherit' });
     } catch (_) {
         console.log('No new changes to commit.');
     }
@@ -163,7 +136,7 @@ try {
 } catch (error) {
     console.error('Git operation notice:', error.message);
 } finally {
-    // 8. ALWAYS restore clean original source code locally
+    // 7. ALWAYS restore clean original source code locally
     console.log('Restoring clean source code locally...');
     files.forEach(file => {
         const filePath = path.join(workspaceDir, file);
