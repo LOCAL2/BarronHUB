@@ -6,17 +6,17 @@ Automated Roblox Script Collection with Obfuscated Builds.
 
 ### 🎯 Arsenal
 ```lua
-loadstring(game:HttpGet("https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/ArsenalHub.lua"))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/LOCAL2/BarronHUB/main/ArsenalHub.lua"))()
 ```
 
 ### 🎯 Clean All The Leaves
 ```lua
-loadstring(game:HttpGet("https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/CleanAllTheLeavesHub.lua"))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/LOCAL2/BarronHUB/main/CleanAllTheLeavesHub.lua"))()
 ```
 
 ### 🎯 Heroes RNG
 ```lua
-loadstring(game:HttpGet("https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/HeroesRNG.luau"))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/LOCAL2/BarronHUB/main/HeroesRNG.luau"))()
 ```
 
 ---
