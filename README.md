@@ -1,5 +1,11 @@
 # BarronHUB
 
+## Anime Dice
+
+```lua
+loadstring(game:HttpGet("https://raw.githubusercontent.com/LOCAL2/BarronHUB/main/AnimeDiceHub.lua"))()
+```
+
 ## Arsenal
 
 ```lua
