@@ -2,7 +2,26 @@ const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
 
-// 1. Get git remote URL to construct raw loadstring URLs
+// 1. Map Information Configuration (Links & Thumbnails)
+const mapMetadata = {
+    'ArsenalHub.lua': {
+        name: 'Arsenal',
+        link: 'https://www.roblox.com/games/286090429/Arsenal',
+        image: 'https://assetgame.roblox.com/Game/Tools/ThumbnailAsset.ashx?aid=286090429&fmt=png&wd=420&ht=230'
+    },
+    'CleanAllTheLeavesHub.lua': {
+        name: 'Clean All The Leaves',
+        link: 'https://www.roblox.com/games/16474136661/Clean-All-The-Leaves',
+        image: 'https://assetgame.roblox.com/Game/Tools/ThumbnailAsset.ashx?aid=16474136661&fmt=png&wd=420&ht=230'
+    },
+    'HeroesRNG.luau': {
+        name: 'Heroes RNG',
+        link: 'https://www.roblox.com/games/16773539194/Heroes-RNG',
+        image: 'https://assetgame.roblox.com/Game/Tools/ThumbnailAsset.ashx?aid=16773539194&fmt=png&wd=420&ht=230'
+    }
+};
+
+// 2. Get git remote URL to construct raw loadstring URLs
 function getGitInfo() {
     try {
         const url = execSync('git config --get remote.origin.url', { encoding: 'utf8' }).trim();
@@ -27,7 +46,7 @@ function getGitInfo() {
     return null;
 }
 
-// 2. Format filename to human readable map name
+// 3. Fallback map name formatter
 function getMapName(filename) {
     let base = path.parse(filename).name;
     if (base.endsWith('Hub')) {
@@ -37,7 +56,7 @@ function getMapName(filename) {
     return formatted.trim();
 }
 
-// 3. Obfuscation helper (Byte-array loader wrapper)
+// 4. Obfuscation helper (Byte-array loader wrapper)
 function obfuscateCode(originalCode, scriptName) {
     let cleanCode = originalCode;
     if (cleanCode.charCodeAt(0) === 0xFEFF) {
@@ -88,47 +107,31 @@ files.forEach(file => {
     originalSources[file] = fs.readFileSync(filePath, 'utf8');
 });
 
-// 4. Update README.md with professional Markdown (No Emojis)
-let readmeContent = `# BarronHUB
-
-High-performance Roblox script suite providing automated features, optimized execution, and full UI customization across multiple titles.
-
-## Features
-
-- **Optimized Performance:** Clean codebase designed for minimal memory consumption and execution latency.
-- **Cross-Game Support:** Dedicated modules built specifically for individual game mechanics.
-- **Auto Obfuscated Builds:** Production builds are secured with byte-level protection.
-
-## Execution Loader Scripts
-
-Execute the corresponding script below in your executor for the desired game module.
-
-`;
+// 5. Build minimal, professional README containing ONLY map sections with links & images
+let readmeContent = `# BarronHUB\n\n`;
 
 files.forEach(file => {
-    const mapName = getMapName(file);
+    const meta = mapMetadata[file] || {
+        name: getMapName(file),
+        link: `https://www.roblox.com/discover`,
+        image: ''
+    };
     const rawUrl = `${rawBaseUrl}/${file}`;
-    readmeContent += `### ${mapName}\n\n`;
+
+    readmeContent += `## ${meta.name}\n\n`;
+    if (meta.image) {
+        readmeContent += `[![${meta.name}](${meta.image})](${meta.link})\n\n`;
+    }
+    readmeContent += `[Game Link](${meta.link})\n\n`;
     readmeContent += `\`\`\`lua\n`;
     readmeContent += `loadstring(game:HttpGet("${rawUrl}"))()\n`;
     readmeContent += `\`\`\`\n\n`;
 });
 
-readmeContent += `## Usage
-
-1. Copy the loader script snippet corresponding to your target game above.
-2. Execute the script within a supported Roblox Lua executor.
-3. Use the integrated UI to toggle desired features.
-
-## Disclaimer
-
-This repository is intended for educational and optimization research purposes. Use responsibly.
-`;
-
 fs.writeFileSync(path.join(workspaceDir, 'README.md'), readmeContent, 'utf8');
-console.log('Updated README.md with professional formatting (No Emojis).');
+console.log('Updated README.md with map sections, links, and images (No extra sections / emojis).');
 
-// 5. Obfuscate files locally for git push
+// 6. Obfuscate files locally for git push
 console.log('Obfuscating scripts for commit...');
 files.forEach(file => {
     const filePath = path.join(workspaceDir, file);
@@ -136,7 +139,7 @@ files.forEach(file => {
     fs.writeFileSync(filePath, obfuscated, 'utf8');
 });
 
-// 6. Execute Git Commands
+// 7. Execute Git Commands
 try {
     if (!fs.existsSync(path.join(workspaceDir, '.git'))) {
         console.log('Initializing git repository...');
@@ -149,7 +152,7 @@ try {
 
     console.log('Committing changes...');
     try {
-        execSync('git commit -m "docs: update README format to professional standard without emojis"', { cwd: workspaceDir, stdio: 'inherit' });
+        execSync('git commit -m "docs: simplify README to map sections with images and links only"', { cwd: workspaceDir, stdio: 'inherit' });
     } catch (_) {
         console.log('No new changes to commit.');
     }
@@ -160,7 +163,7 @@ try {
 } catch (error) {
     console.error('Git operation notice:', error.message);
 } finally {
-    // 7. ALWAYS restore clean original source code locally
+    // 8. ALWAYS restore clean original source code locally
     console.log('Restoring clean source code locally...');
     files.forEach(file => {
         const filePath = path.join(workspaceDir, file);
