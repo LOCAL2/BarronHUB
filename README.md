@@ -24,3 +24,9 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/LOCAL2/BarronHUB/main
 loadstring(game:HttpGet("https://raw.githubusercontent.com/LOCAL2/BarronHUB/main/HeroesRNG.luau"))()
 ```
 
+## result
+
+```lua
+loadstring(game:HttpGet("https://raw.githubusercontent.com/LOCAL2/BarronHUB/main/result.luau"))()
+```
+
